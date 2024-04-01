@@ -1,0 +1,32 @@
+ERROR moss not found
+stored eno 433 at location 5
+ERROR fred not found
+stored gorge 18 at location 3
+stored moss 25 at location 44
+eno found at location 5 with value 433
+stored cats 4 at location 19
+stored dogs 12 at location 50
+stored mnea 1 at location 7
+ERROR mnec not found
+mnea found at location 7 with value 1
+stored cato 75 at location 15
+dogs found at location 50 with value 12
+gorge found at location 3 with value 18
+stored jacksonville 32 at location 4
+stored orlando 12 at location 8
+ERROR miami not found
+eno found at location 5 with value 433
+cats found at location 19 with value 4
+stored USA 1 at location 14
+stored fit 7 at location 9
+orlando found at location 8 with value 12
+mnea found at location 7 with value 1
+ERROR fred not found
+cato found at location 15 with value 75
+ERROR cato already exists at location 15
+cato found at location 15 with value 75
+stored phobos 8 at location 40
+stored deimos 8 at location 36
+stored ping 2 at location 2
+collision at location 36
+ERROR unf not found

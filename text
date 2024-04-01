@@ -1,0 +1,20 @@
+Travis Jones
+N00436223
+Project 1
+COP3404
+
+Purpose of project: Project 1 is a hash table that stores instruction mnemonics and associated number values. The hash table can be used to store and provide fast access to instructions for an assembler. 
+
+My implementation has 3 Java classes: The main method and some associated methods are part of Project1. Main will create a new Table object based on the Table class, which is compiled from Table.java. Table objects insert or find mnemonics and their number values in an array of Instr objects using quadratic probing. Instr objects are simple containers for mnemonics and numbers (stored as strings). Mnemonics are hashed using Horner's Polynomial with the genHash method (assuming 128 ASCII characters). That hash value, modulus with the array size, determines the array index. 
+
+Source files: Project1.java, Table.java, Instr.java
+
+Input file: sample_input
+
+Output file: sample_output
+
+Instructions to execute: From command line on Osprey, run
+
+	make; java Project1 [file name]
+
+where "[file name]" is the name of an input file. Output will print to command line.

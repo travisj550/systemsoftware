@@ -1,0 +1,371 @@
+# This is a shell archive.  Save it in a file, remove anything before
+# this line, and then unpack it by entering "sh file".  Note, it may
+# create directories; files and directories will be owned by you and
+# have default permissions.
+#
+# This archive contains:
+#
+#	Instr.java
+#	Project1.java
+#	Table.java
+#	makefile
+#	sample_input
+#	sample_output
+#	text
+#
+echo x - Instr.java
+sed 's/^X//' >Instr.java << 'END-of-Instr.java'
+X//Travis Jones n00436223
+X//Project 1 COP3404
+X
+X//Instr objects store instructions and their number values
+Xpublic class Instr {
+X	private String mneu = "";
+X	private String num = "";
+X
+X	//Construct a new Instr with s
+X	public Instr(String s) {
+X		mneu = s;
+X	}
+X	//Setter
+X	public void setNum(String n) {
+X		num = n;
+X	}
+X	//Getter
+X	public String getInstr() {
+X		return mneu;
+X	}
+X	//Getter
+X	public String getNum() {
+X		return num;
+X	}
+X	
+X}
+END-of-Instr.java
+echo x - Project1.java
+sed 's/^X//' >Project1.java << 'END-of-Project1.java'
+X//Travis Jones n00436223
+X//Project 1 COP3404
+X
+Ximport java.io.*;
+Ximport java.util.*;
+X
+Xclass Project1 {
+X
+X    public static void main(String args[]) throws FileNotFoundException {
+X
+X        java.io.File file = new java.io.File(args[0]);
+X        Scanner in = new Scanner(file);
+X		
+X		//Read the contents of the entire file to a string
+X        String temp = in.useDelimiter("\\Z").next();
+X
+X        in.close();
+X		
+X		//Find the number of instructions
+X        int n = countInstr(temp);
+X		//Find the smallest prime number greater than
+X		//twice the number of instructions
+X        int p = findPrime(n);
+X
+X		//Create a hash table of size p
+X        Table table = new Table(p);
+X
+X		//Insert the instructions from the temp string
+X		//in the Table table
+X        toTable(temp, table);
+X        
+X        return;
+X    }
+X	//Count the number of lines in s
+X    public static int countInstr(String s) {  
+X		
+X		int n=0;
+X		Scanner in = new Scanner(s);
+X		
+X		while(in.hasNextLine()) {
+X			n++;
+X			in.nextLine();
+X		}
+X		in.close();
+X		return n;
+X	}
+X	//Find the smallest prime number greater than twice
+X	//the value of n
+X	public static int findPrime(int n) {
+X		
+X		n*=2;
+X		n+=1;
+X		int m=0;
+X
+X		for(m=2; m<n; m++) {
+X			
+X			if(n%m==0) {
+X				n++;
+X				m=2;
+X			}
+X			else if(m==n-1 && n%m != 0) {
+X				break;
+X			}
+X		}
+X		return n;
+X    }
+X    //Read instructions from a String and insert them in a Table
+X    public static void toTable(String s, Table table) {
+X
+X        Scanner in = new Scanner(s);
+X        String temp = "";
+X        String mneu = "";
+X        String num = "";
+X        
+X		//If there is another token in s, move to that token
+X        if(in.hasNext()) {
+X        		temp = in.next();
+X        }
+X		//If not, return
+X        else {
+X        		in.close();
+X        		return;
+X        }
+X        //Create brk and set it to false 
+X        boolean brk = false;
+X                
+X        do {
+X            //If the current token is a mneumonic
+X            if(!temp.isEmpty() && Character.isLetter(temp.charAt(0))) {
+X            		mneu = temp;
+X            		if(in.hasNext()) {
+X						//If there is another token, assume that it's a number
+X                		num = in.next();
+X            		}
+X					//If not, finish this loop and then break
+X            		else {
+X            			brk = true;
+X            		}
+X            		//If the next token is really a number
+X            		if(!num.isEmpty() && Character.isDigit(num.charAt(0))) {
+X						//Insert mneu and num as part of the same instruction
+X            			table.insertInstr(mneu, num);
+X						//Set num to empty
+X            			num = "";
+X            			if(in.hasNext()) {
+X							//If there is another token, set temp equal to it
+X                			temp = in.next();
+X            			}
+X            			else {
+X							//If not, exit the loop
+X            				break;
+X            			}
+X            		}
+X            		else {
+X						//If num wasn't a number, set temp equal to it
+X            			temp = num;
+X						//Set num to empty
+X            			num = "";
+X						//Search for an instruction with mneu that already 
+X						//exists with insertInstr, or print an error
+X            			table.insertInstr(mneu, num);
+X            		}
+X            }
+X        } while(brk == false);
+X        //If the while loop has finished, nothing is left to scan
+X        in.close();
+X        return;
+X    }
+X}
+END-of-Project1.java
+echo x - Table.java
+sed 's/^X//' >Table.java << 'END-of-Table.java'
+X//Travis Jones n00436223
+X//Project 1 COP3404
+X
+Ximport java.util.Objects;
+X
+X//Table creates a hash table with an array of Instr objects
+Xpublic class Table {
+X	
+X	private Instr[] array;
+X	private int length;
+X
+X	//Create a new Table with p elements
+X	public Table(int p) {
+X		length = p;
+X		array = new Instr[length];	
+X	}
+X	//Generate a hash based on s
+X	private int genHash(String s) {
+X		int hash = 0;
+X		//For each character in s
+X		for(int i=0; i<s.length(); i++) {
+X			int ch = s.charAt(i);
+X			//calculate Horner's Polynomial assuming 128 ASCII characters
+X			hash = (hash * 128 + ch) % length;
+X		}
+X		return hash;
+X	}
+X	//Find if a mneumonic already exists, or insert a new Instr
+X	public void insertInstr(String s, String n) {
+X		//Create a new Instr with s
+X		Instr instr = new Instr(s);
+X		//If n isn't an empty string, set the (string) number for instr to n
+X		if(!n.isEmpty()) {
+X			instr.setNum(n);
+X		}
+X		//Find a hash value for the mneumonic, s
+X		int hash = genHash(s);
+X		
+X		int i = 1;
+X		//Until an empty space in the table is found
+X		while(array[hash] != null) {
+X			//If the instruction stored has the same mneumonic
+X			if(Objects.equals(array[hash].getInstr(), instr.getInstr())) {
+X				//If a number was included, print error and return
+X				if(!instr.getNum().isEmpty()) {
+X					System.out.println("ERROR " + instr.getInstr() + 
+X							" already exists at location " + hash);
+X					return;
+X				}
+X				//If a number wasn't included, print the instruction found
+X				//and return
+X				else {
+X					System.out.println(instr.getInstr() + 
+X							" found at location " + hash + " with value " 
+X							+ array[hash].getNum());
+X					return;
+X				}
+X			}
+X			//If the instruction doesn't have the same mneumonic,
+X			//a collision has occurred
+X			else {
+X				System.out.println("collision at location " + hash);
+X				hash = hash + i*i;
+X				i++;
+X				hash %= length;
+X			}
+X		}
+X		//If a number wasn't included in n but nothing with that mneumonic
+X		//was found, print an error
+X		if(instr.getNum().isEmpty()) {
+X			System.out.println("ERROR " + instr.getInstr() + " not found");
+X		}
+X		//If a number was included, store instr at that part of the hash table
+X		else {
+X			array[hash] = instr;
+X			
+X			System.out.println("stored " + instr.getInstr() + " " +
+X			instr.getNum() + " at location " + hash);
+X		}
+X	}
+X}
+END-of-Table.java
+echo x - makefile
+sed 's/^X//' >makefile << 'END-of-makefile'
+Xall: Project1.class Table.class Instr.class
+XInstr.class: Instr.java
+X	javac Instr.java
+XTable.class: Table.java
+X	javac Table.java
+XProject1.class: Project1.java
+X	javac Project1.java
+X
+X
+X
+X
+X
+X
+X
+END-of-makefile
+echo x - sample_input
+sed 's/^X//' >sample_input << 'END-of-sample_input'
+Xmoss
+Xeno 433
+Xfred
+Xgorge 18
+Xmoss 25
+Xeno
+Xcats 4
+Xdogs 12
+Xmnea 1
+Xmnec
+Xmnea
+Xcato 75
+Xdogs
+Xgorge
+Xjacksonville 32
+Xorlando 12
+Xmiami
+Xeno
+Xcats
+XUSA 1
+Xfit 7
+Xorlando
+Xmnea
+Xfred
+Xcato
+Xcato 20
+Xcato
+Xphobos 8
+Xdeimos 8
+Xping 2
+Xunf
+END-of-sample_input
+echo x - sample_output
+sed 's/^X//' >sample_output << 'END-of-sample_output'
+XERROR moss not found
+Xstored eno 433 at location 5
+XERROR fred not found
+Xstored gorge 18 at location 3
+Xstored moss 25 at location 44
+Xeno found at location 5 with value 433
+Xstored cats 4 at location 19
+Xstored dogs 12 at location 50
+Xstored mnea 1 at location 7
+XERROR mnec not found
+Xmnea found at location 7 with value 1
+Xstored cato 75 at location 15
+Xdogs found at location 50 with value 12
+Xgorge found at location 3 with value 18
+Xstored jacksonville 32 at location 4
+Xstored orlando 12 at location 8
+XERROR miami not found
+Xeno found at location 5 with value 433
+Xcats found at location 19 with value 4
+Xstored USA 1 at location 14
+Xstored fit 7 at location 9
+Xorlando found at location 8 with value 12
+Xmnea found at location 7 with value 1
+XERROR fred not found
+Xcato found at location 15 with value 75
+XERROR cato already exists at location 15
+Xcato found at location 15 with value 75
+Xstored phobos 8 at location 40
+Xstored deimos 8 at location 36
+Xstored ping 2 at location 2
+Xcollision at location 36
+XERROR unf not found
+END-of-sample_output
+echo x - text
+sed 's/^X//' >text << 'END-of-text'
+XTravis Jones
+XN00436223
+XProject 1
+XCOP3404
+X
+XPurpose of project: Project 1 is a hash table that stores instruction mnemonics and associated number values. The hash table can be used to store and provide fast access to instructions for an assembler. 
+X
+XMy implementation has 3 Java classes: The main method and some associated methods are part of Project1. Main will create a new Table object based on the Table class, which is compiled from Table.java. Table objects insert or find mnemonics and their number values in an array of Instr objects using quadratic probing. Instr objects are simple containers for mnemonics and numbers (stored as strings). Mnemonics are hashed using Horner's Polynomial with the genHash method (assuming 128 ASCII characters). That hash value, modulus with the array size, determines the array index. 
+X
+XSource files: Project1.java, Table.java, Instr.java
+X
+XInput file: sample_input
+X
+XOutput file: sample_output
+X
+XInstructions to execute: From command line on Osprey, run
+X
+X	make; java Project1 [file name]
+X
+Xwhere "[file name]" is the name of an input file. Output will print to command line.
+END-of-text
+exit
+
