@@ -1,0 +1,18 @@
+Travis Jones
+N00436223
+Project 3
+COP3404
+
+Purpose of project: This is pass 1 of a SIC/XE compatible assembler.
+
+Source files: Project3.java, DataItem.java, Table.java, Instr.java
+
+Input File: Sample_Input.txt
+
+Sample Output: Sample_Output.png 
+
+Instructions to execute: From command line on Osprey, run
+
+	make; java Project3 [file name]
+
+where "[file name]" is the name of an input file. Output will print to command line. The input code will print with any detected errors appended after the appropriate lines. The symbol table will print after the input code, separated by a blank line.

@@ -1,0 +1,1116 @@
+# This is a shell archive.  Save it in a file, remove anything before
+# this line, and then unpack it by entering "sh file".  Note, it may
+# create directories; files and directories will be owned by you and
+# have default permissions.
+#
+# This archive contains:
+#
+#	DataItem.java
+#	Instr.java
+#	Project3.java
+#	Sample_Input.txt
+#	Sample_Output.png
+#	Table.java
+#	makefile
+#	text.txt
+#
+echo x - DataItem.java
+sed 's/^X//' >DataItem.java << 'END-of-DataItem.java'
+X//Travis Jones n00436223
+X//Project 3 COP3404
+X
+Xpublic class DataItem {
+X	
+X	private int error = 0;
+X	private String label = "";
+X	
+X	//mneu can be an instruction mneumonic or an assembler directive
+X	private String mneu = "";
+X	
+X	//Convert to hex with Integer.parseInt(Hex,16)
+X	private int address = 0;
+X	private int mem = 0;
+X	private boolean ext = false;
+X	private boolean indir = false;
+X	private boolean immed = false;
+X	private boolean sic = false;
+X	private String operand = "";
+X	private String comment = "";
+X	private boolean opLabel = false;
+X	
+X	//If normal instruction or assembler directive
+X	DataItem(String label, int address, int mem, String mneu, boolean ext, boolean indir, boolean immed, boolean sic, String operand, Boolean opLabel, String comment, int error) {
+X		this.label = label;
+X		this.address = address;
+X		this.mem = mem;
+X		this.mneu = mneu;
+X		this.ext = ext;
+X		this.indir = indir;
+X		this.immed = immed;
+X		this.sic = sic;
+X		this.operand = operand;
+X		this.opLabel = opLabel;
+X		this.comment = comment;
+X		this.error = error;
+X	}
+X	//If comment
+X	DataItem(String comment, int addr) {
+X		this.comment = comment;
+X		this.address = addr;
+X	}
+X	//For literals
+X	DataItem(int address, int mem, String label, String mneu, String operand) {
+X		this.address = address;
+X		this.mem = mem;
+X		this.label = label;
+X		this.mneu = mneu;
+X		this.operand = operand;
+X	}
+X	public int getAddress() {
+X		return address;
+X	}
+X	public int getNext() {
+X		return address + mem;
+X	}
+X	public String getLabel() {
+X		return label;
+X	}
+X	public String getOperand() {
+X		return operand;
+X	}
+X	public boolean getOpLabel() {
+X		return opLabel;
+X	}
+X	public void setError(int e) {
+X		this.error = e;
+X	}
+X	//Print this instruction or comment, followed by any errors
+X	public void printLine() {
+X		
+X		if(mneu.equals("")) {
+X			System.out.println("." + comment);
+X			return;
+X		}
+X		
+X		System.out.print(Integer.toHexString(address).toUpperCase() + "\t");
+X		
+X		if(!label.equals("")) {
+X			System.out.print(label + "\t");
+X		}
+X		
+X		else {
+X			System.out.print("\t");
+X		}
+X				
+X		if(ext == true) {
+X			System.out.print("+");
+X		}
+X		
+X		if(sic == true) {
+X			System.out.print("*");
+X		}
+X		
+X		System.out.print(mneu + "\t");
+X		
+X		if(immed == true) {
+X			System.out.print("#");
+X		}
+X		
+X		if(indir == true) {
+X			System.out.print("@");
+X		}
+X		
+X		System.out.print(operand + "\t" + comment + "\n");
+X		
+X		//Create error codes based on sicasm, rather than examples
+X		if(error != 0) {
+X			if(error == 1) {
+X				System.out.print("ERROR: Invalid Mneumonic \"" + mneu + 
+X						"\" (line will be ignored)\n");
+X				return;
+X			}
+X			if(error == 2) {
+X				System.out.print("ERROR: Undefined Label \"" + operand + "\"\n");
+X				return;
+X			}
+X			if(error == 3) {
+X				System.out.print("ERROR: Duplicate Label \"" + label + "\"\n");
+X				return;
+X			}
+X			if(error == 4) {
+X				System.out.print("ERROR: Invalid Operand \"" + operand + "\"\n");
+X				return;
+X			}
+X			if(error == 5) {
+X				System.out.print("ERROR: Missing Operand\n");
+X				return;
+X			}
+X			if(error == 6) {
+X				System.out.print("ERROR: Mneumonic Not SIC Compatible \"*" + mneu + "\" (line will be ignored)\n");
+X			}
+X			if(error == 7) {
+X				System.out.print("ERROR: Invalid Label \"" + label + "\"\n");
+X			}
+X		}
+X	}
+X}
+END-of-DataItem.java
+echo x - Instr.java
+sed 's/^X//' >Instr.java << 'END-of-Instr.java'
+X//Travis Jones n00436223
+X//Project 3 COP3404
+X
+Xpublic class Instr {
+X	private String label = "";
+X	private String address = "";
+X
+X	public Instr(String s) {
+X		label = s;
+X	}
+X	
+X	public void setAddress(String n) {
+X		address = n;
+X	}
+X
+X	public String getLabel() {
+X		return label;
+X	}
+X	
+X	public String getAddress() {
+X		return address;
+X	}
+X	
+X}
+END-of-Instr.java
+echo x - Project3.java
+sed 's/^X//' >Project3.java << 'END-of-Project3.java'
+X//Travis Jones n00436223
+X//Project 3 COP3404
+X
+Ximport java.io.*;
+Ximport java.util.*;
+X
+Xclass Project3 {
+X		
+X    //File not found exception handling...
+X    public static void main(String args[]) throws FileNotFoundException {
+X
+X        java.io.File file = new java.io.File(args[0]);
+X        Scanner in = new Scanner(file);
+X
+X        String temp = in.useDelimiter("\\Z").next();
+X
+X        in.close();
+X        
+X        LinkedList<DataItem> instructions = new LinkedList<DataItem>();
+X        
+X        int n = countInstr(temp);
+X        int p = findPrime(n);
+X        
+X        Table symtab = new Table(p);
+X        
+X		LinkedList<String> literals = new LinkedList<String>();
+X        
+X        //Read instructions line by line from temp, adding them to
+X        //the instructions LinkedList as DataItems, and inserting
+X        //labels in symtab
+X        readInstr(literals, temp, instructions, symtab);
+X		
+X		addLiterals(literals, symtab, instructions);
+X		
+X        //Find duplicate and undefined labels
+X		checkLabels(instructions, symtab);
+X		        
+X        ListIterator<DataItem> iterator = instructions.listIterator();
+X        
+X        while(iterator.hasNext()) {
+X        	
+X        		iterator.next().printLine();
+X        }
+X        
+X        System.out.println();
+X        
+X        symtab.printTable();
+X                
+X        /*
+X        //Instead of counting temp, count just the instructions with labels
+X        int n = countInstr(temp);
+X        int p = findPrime(n);
+X
+X        Table table = new Table(p);
+X
+X        toTable(temp, table);
+X        */
+X        
+X        return;
+X    }
+X    public static void addLiterals(LinkedList<String> literals, Table symtab, LinkedList<DataItem> llist) {
+X    	    	
+X    	
+X
+X    		while(!literals.isEmpty()) {
+X    			
+X        		String label = literals.pop();
+X        		String operand = label.substring(1, label.length());
+X        		String mneu = "BYTE";
+X        		int mem = 0;
+X        		
+X        		
+X        		int address = llist.getLast().getNext();
+X        		
+X        		if(label.charAt(1) == 'X') {
+X        			mem = ( label.length() - 4 ) / 2;
+X        		}
+X        		else {
+X        			mem = ( label.length() - 4 );
+X        		}
+X        		
+X        		DataItem literal = new DataItem(address, mem, label, mneu, operand);
+X        		llist.add(literal);
+X        		
+X        		symtab.insertSymbol(literal);
+X    		}
+X    }
+X    //Check if mneu is a valid mneumonic. If it is, return the bytes
+X    //needed by the instruction, or -2 for an assembler directive. 
+X    //If it isn't, return -1
+X    public static int checkMneu(String mneu, boolean ext, boolean sic) {
+X    	
+X    	
+X    		int mem = 0;
+X    		
+X    		//If mneumonic has * but isn't a SIC mneumonic
+X    		if(sic == true && !mneu.matches("ST([XLA]||SW||CH)||OR||LD([ALX]||CH)||[TWR]D||J(SUB||LT||EQ||GT)||TIX||DIV||AND||MUL||COMP||ADD||(R)SUB||BYTE||WORD||RES[BW]")) {
+X    			mem = -7;
+X    			return mem;
+X    		}
+X    		
+X    		//This should probably be a switch...
+X    		
+X    		//If mneu is an assembler directive
+X		if (mneu.equals("START")) {
+X			if (ext == true) {
+X				mem = -1;
+X			}
+X			else {
+X				mem = -5;
+X			}
+X		}
+X		else if(mneu.matches("BASE")) {
+X			if (ext == true) {
+X				mem = -1;
+X			}
+X			else {
+X				mem = -2;
+X			}
+X		}
+X		else if(mneu.matches("END")) {
+X			if (ext == true) {
+X				mem = -1;
+X			}
+X			else {
+X				mem = -12;
+X			}
+X		}
+X		else if(mneu.matches("LTORG")) {
+X			if (ext == true) {
+X				mem = -1;
+X			}
+X			else {
+X				mem = -11;
+X			}
+X		}
+X    		//Need regex here for different registers with LD and ST
+X    		else if(mneu.matches("LD([AXLBSTF]||CH)") || mneu.matches("ST([AXLBSTFI]||SW||CH)")) {
+X    			mem = -22;
+X    		}
+X    		else if(mneu.matches("WORD")) {
+X    			mem = -13;
+X    			if(ext == true) {
+X    				mem = -1;
+X    			}
+X    		}
+X    		else if(mneu.matches("BYTE")) {
+X    			mem = -14;
+X    			if(ext == true) {
+X    				mem = -1;
+X    			}
+X    		}
+X    		else if(mneu.matches("RESW")) {
+X    			mem = -3;
+X    			if(ext == true) {
+X    				mem = -1;
+X    			}
+X    		}
+X    		else if(mneu.matches("RESB")) {
+X    			mem = -4;
+X    			if(ext == true) {
+X    				mem = -1;
+X    			}
+X    		}  
+X		//Register operations
+X    		else if(mneu.matches("(ADD||COMP||SUB||TIX||MUL||DIV)R||RMO||SHIFT[LR]||CLEAR")) {
+X    			
+X    			if(mneu.matches("SHIFT[LR]")) {
+X    				mem = -8;
+X    			}
+X    			else if(mneu.matches("CLEAR")) {
+X    				mem = -9;
+X    			}
+X    			else {
+X    				mem = -10;
+X    			}
+X    						
+X			if(ext == true) {
+X				mem = -1;
+X			}
+X    		}
+X		//Need regex for mneumonics starting with J
+X    		//If mneu is a subroutine operation
+X    		else if(mneu.matches("J(SUB||EQ||LT||GT)")) {
+X    			//Need to check if label is valid
+X    			
+X    			mem = -16;
+X    		}    	
+X    		else if(mneu.matches("RSUB")) {
+X    			//Shouldn't have an operand
+X    			
+X    			mem = -15;
+X    		}    
+X    		else if(mneu.matches("[TWR]D")) {
+X    			mem = -17;
+X    		}
+X		//Register A math
+X    		else if(mneu.matches("ADD||AND||COMP||DIV||MUL||SUB")) {
+X    			mem = -18;
+X    		}
+X		//Floating point math
+X    		else if(mneu.matches("(ADD||COMP||DIV||MUL||SUB)F")) {
+X    			mem = -19;
+X    		}
+X		//Uncategorized format 3 (requiring operands)
+X    		else if(mneu.matches("SSK||LPS")) {
+X    			mem = -20;
+X    		}
+X		//Uncategorized format 2 (requiring operands)
+X    		else if(mneu.matches("SVC")) {
+X    			mem = -21;
+X    		}
+X		//Format 1 operations (no operands)
+X    		else if(mneu.matches("[HST]IO||FIX||FLOAT||NORM")) {
+X    			mem = -6;
+X    		}
+X    		else {
+X    			mem = -1;
+X    		}
+X
+X    		return mem;
+X    }
+X    //Split off operand checks here
+X    public static int[] checkOpnd(LinkedList<DataItem> llist, Table symtab, String operand, int mem, boolean  ext, boolean immed, boolean indir) {
+X    	
+X    		//{error, mem, address, opLabel}
+X    		int[] result = {0,0,0,0,0};
+X    		int error = 0;
+X    		int address = -1;
+X    		int opLabel = 0;
+X    		int literal = 0;
+X    		
+X		if (operand.startsWith("#")) {
+X			immed = true;
+X			operand = operand.substring(1);
+X			//START
+X			if(mem == -5) {
+X				error = 1;
+X				mem = 0;
+X			}
+X		}
+X		else if (operand.startsWith("@")) {
+X			indir = true;
+X			operand = operand.substring(1);
+X			
+X			//START and BASE 
+X			if(mem == -5 || mem == -2) {
+X				error = 1;
+X				mem = 0;
+X			}
+X		}
+X		
+X		//If mneumonic requires operand but doesn't have one
+X		if (operand.matches("") && mem != -15 && mem != -5 && mem != -2 && mem != -12 && mem != -11 && mem != -6) {
+X			mem = 0;
+X			error = 5;
+X		}
+X		//END
+X		if (mem == -12) {
+X			
+X			/*
+X			String startLbl = llist.getFirst().getLabel();
+X			
+X			System.out.println(startLbl);
+X			
+X			if(!operand.equals(startLbl)) {
+X				error = 7;
+X			}
+X			*/
+X			mem = 0;
+X		}
+X		//LTORG
+X		else if (mem == -11) {
+X			if(!operand.matches("")) {
+X				error = 4;
+X			}
+X			mem = 0;
+X		}
+X		else if(llist.isEmpty()) {
+X			//START
+X			if(mem == -5) {
+X				if(operand.matches("")) {
+X					address = 0;
+X				}
+X				else if(operand.matches("([0-9]|[A-F])*")) {
+X					address = Integer.parseInt(operand, 16);
+X				}
+X				else {
+X					error = 4;
+X					address = 0;
+X				}
+X				mem = 0;
+X			}
+X		}
+X		//RESW
+X		if(mem == -3) {
+X			if(operand.matches("[0-9]+")) {
+X				mem = Integer.parseInt(operand) * 3;
+X			}
+X			else {
+X				error = 4;
+X				mem = 0;
+X			}
+X		}
+X		//RESB
+X		else if(mem == -4) {
+X			if(operand.matches("[0-9]+")) {
+X				mem = Integer.parseInt(operand);
+X			}
+X			else {
+X				error = 4;
+X				mem = 0;
+X			}
+X		}
+X		//WORD
+X		else if(mem == -13) {
+X			//Can be X'' or C'' or ints?
+X			//Limits on WORD
+X			if(operand.matches("X'([0-9]|[A-F])?([0-9]|[A-F])?([0-9]|[A-F])?([0-9]|[A-F])?([0-9]|[A-F])?([0-9]|[A-F])?'||C'\\w{1,3}'")) {
+X				mem = 3;
+X			}
+X			else if (operand.matches("\\d*")) {
+X				
+X				int d = Integer.parseInt(operand);
+X				mem = 3;
+X				
+X				if (d > 16777215) {
+X					mem = 3;
+X					error = 4;
+X				}
+X			}
+X			else {
+X				mem = 3;
+X				error = 4;
+X			}
+X			
+X		}
+X		//BYTE
+X		else if(mem == -14) {
+X			//Can be X'' or C'' or ints?
+X			//Limits on BYTE
+X			if(operand.matches("X'([0-9]|[A-F])?([0-9]|[A-F])?'||C'\\w'")) {
+X				mem = 1;
+X			}
+X			else if (operand.matches("\\d*")) {
+X				
+X				int d = Integer.parseInt(operand);
+X				mem = 1;
+X				
+X				if (d > 255) {
+X					mem = 1;
+X					error = 4;
+X				}
+X			}
+X			else {
+X				mem = 1;
+X				error = 4;
+X			}
+X			
+X		}
+X		//RSUB, no operand
+X		else if(mem == -15) {
+X			if(operand.matches("")) {
+X				mem = 3;
+X			}
+X			else {
+X				mem = 3;
+X				error = 4;
+X			}
+X		}
+X		//Subroutine operations
+X		else if(mem == -16) {
+X			//Validate labels
+X			mem = 3;
+X			opLabel = 1;
+X			
+X			/*
+X			else {
+X				mem = 0;
+X				error = 4;
+X			}
+X			*/
+X		}
+X		//For mneumonics that don't need operands, like SIO
+X		else if (mem == -6) {
+X			
+X			if(operand.equals("")) {
+X				mem = 1;
+X			}
+X			else {
+X				error = 4;
+X				mem = 3;
+X			}
+X		}
+X		//Invalid SIC mneumonic
+X		else if (mem == -7) {
+X			error = 6;
+X			mem = 3;
+X		}
+X		//SHIFT[LR]
+X		else if (mem == -8) {
+X			if(operand.matches("[AXLBSTF],\\d")) {
+X				mem = 2;
+X			}
+X			else {
+X				error = 4;
+X				mem = 2;
+X			}
+X		}
+X		//CLEAR
+X		else if (mem == -9) {
+X			if(operand.matches("[AXLBSTF]")) {
+X				mem = 2;
+X			}
+X			else {
+X				error = 4;
+X				mem = 2;
+X			}
+X		}
+X		//BASE
+X		else if (mem == -2) {
+X			//Verify Labels
+X			opLabel = 1;
+X		}
+X		//Other register operations
+X		else if (mem == -10) {
+X			if(operand.matches("[AXLBSTF],[AXLBSTF]")) {
+X				mem = 2;
+X			}
+X			else {
+X				error = 4;
+X				mem = 2;
+X			}
+X		}
+X		//TD WD RD
+X		else if (mem == -17) {
+X			//Verify labels
+X			opLabel = 1;
+X			mem = 3;
+X		}
+X		//Register A math
+X		else if (mem == -18) {
+X			
+X			if(operand.matches("\\d*")) {
+X				mem = 3;
+X			}
+X			else if(operand.matches("=X'([0-9]|[A-F])*'")) {
+X				mem = 3;
+X			}
+X			//Verify labels
+X			else {
+X				opLabel = 1;
+X				mem = 3;
+X				error = 4;
+X			}
+X			
+X		}
+X		//Floating point math
+X		else if (mem == -19) {
+X			
+X			if(operand.matches("\\d*.*\\d*")) {
+X				mem = 3;
+X				opLabel = 1;
+X			}
+X			else if(operand.matches("=X'([0-9]|[A-F])*'")) {
+X				mem = 3;
+X			}
+X			//Verify labels
+X			else {
+X				opLabel = 1;
+X				mem = 3;
+X				error = 4;
+X			}
+X			
+X		}
+X		//Uncategorized format 3
+X		else if (mem == -20) {
+X			//Verify labels
+X			opLabel = 1;
+X			mem = 3;
+X		}
+X		//Uncategorized format 2
+X		else if (mem == -21) {
+X			//Verify labels
+X			opLabel = 1;
+X			mem = 2;
+X		}
+X		//LD or ST
+X		else if (mem == -22) {
+X			//Verify labels
+X			opLabel = 1;
+X			mem = 3;
+X		}
+X		if(ext == true && mem > 0) {
+X			mem++;
+X		}
+X		
+X		if(indir == true) {
+X			
+X			if(operand.matches("\\d*")) {
+X				error = 4;
+X			}
+X			else {
+X				opLabel = 1;
+X			}
+X		}
+X		
+X		if(operand.matches("=C'\\w*'") || operand.matches("=X'\\d*'")) {
+X			literal = 1;
+X		}
+X		
+X		
+X 		result[0] = error;
+X		result[1] = mem;
+X		result[2] = address;
+X		result[3] = opLabel;
+X		result[4] = literal;
+X		
+X    		return result;
+X    }
+X    
+X    //Throw error if too many or missing (required) columns
+X    public static LinkedList<DataItem> readInstr(LinkedList<String> literals, String s, LinkedList<DataItem> llist, Table symtab) {  
+X		
+X		Scanner in = new Scanner(s);
+X		
+X						
+X		while(in.hasNext()) {
+X			
+X			int address = 0;
+X			int mem = 0;
+X			String comment = "";
+X			int error = 0;
+X			boolean opLabel = false;
+X			
+X			String line = in.nextLine();
+X						
+X			Scanner inLine = new Scanner(line);
+X			
+X			
+X			if(!llist.isEmpty()){
+X				//Store mem in DataItem. Use address + mem of current DataItem
+X				//to create new DataItems
+X				//Implement own LinkedList to resolve?
+X				//Add mem size to DataItem for getNext?
+X				//(Implement getNext...
+X				address = llist.getLast().getNext();
+X			}
+X			
+X			if(line.matches("\\s*")) {
+X				DataItem blank = new DataItem(comment, address);
+X				llist.add(blank);
+X				continue;
+X			}
+X												
+X			//If a line is a comment
+X			if(line.startsWith(".")) {
+X				
+X				
+X				comment = line.substring(1);
+X				DataItem current = new DataItem(comment, address);
+X				llist.add(current);
+X				
+X				
+X				continue;
+X			}
+X			
+X			String label = "";
+X			
+X			if(!Character.isWhitespace(line.charAt(0))) {
+X				label = inLine.next();
+X			}
+X			
+X			String mneu = "";
+X			
+X			if(inLine.hasNext()) {
+X				mneu = inLine.next();
+X			}
+X
+X			boolean ext = false;
+X			
+X			if (mneu.startsWith("+")) {
+X				ext = true;
+X				mneu = mneu.substring(1);
+X			}
+X			
+X			boolean sic = false;
+X			
+X			if (mneu.startsWith("*")) {
+X				sic = true;
+X				mneu = mneu.substring(1);
+X			}
+X			
+X			mem = checkMneu(mneu, ext, sic);
+X			
+X			if(mem == -1) {
+X				//mneumonic is invalid
+X				
+X				error = 1;
+X				mem = 0;
+X			}
+X			else if(mem == -2) {
+X				//mneumonic is an assembler directive
+X				
+X				mem = 0;
+X			}
+X			
+X			boolean immed = false;
+X			boolean indir = false;
+X			String operand = "";
+X			
+X			//Can split operand off into separate method...
+X			if(inLine.hasNext()) {
+X				operand = inLine.next();
+X			}
+X			//{error, mem, address}
+X			int[] check = {0,0,0,0};
+X			
+X			check = checkOpnd(llist, symtab, operand, mem, ext, immed, indir);
+X			
+X			error = check[0];
+X			mem = check[1];
+X			
+X			if(check[3] == 1) {
+X				opLabel = true;
+X			}
+X						
+X			if(check[4] == 1) {				
+X				literals.push(operand);
+X			}
+X			
+X			if(check[2] != -1) {
+X				address = check[2];
+X			}
+X			
+X			while(inLine.hasNext()) {
+X				inLine.useDelimiter("\\z");
+X				comment = inLine.next();
+X			}
+X			
+X			DataItem current = new DataItem(label, address, mem, mneu, ext, indir, immed, sic, operand, opLabel, comment, error);
+X			
+X			int symError = 0;
+X			
+X			//Insert labels into symbol table
+X			if(!label.equals("") && !label.substring(0, 1).matches("[0-9]")) {
+X				symError = symtab.insertSymbol(current);
+X			}
+X			
+X			if(!label.equals("") && label.substring(0, 1).matches("[0-9]")) {
+X				current.setError(7);
+X			}
+X						
+X			if(symError == 3) {
+X				current.setError(3);
+X			}
+X			if(symError == 2) {
+X				current.setError(2);
+X			}
+X			
+X			llist.add(current);
+X			
+X			inLine.close();
+X			
+X		}
+X		
+X		in.close();
+X		return llist;
+X	}
+X    
+X    public static LinkedList<DataItem> checkLabels(LinkedList<DataItem> llist, Table symtab) {
+X    	
+X    		
+X        ListIterator<DataItem> iterator = llist.listIterator();
+X        String address = "";
+X        String operand = "";
+X        
+X        //DataItem current = llist.getFirst();
+X        
+X        while(iterator.hasNext()) {
+X        	
+X    			DataItem current = iterator.next();
+X    			        	    
+X        		if(current.getOpLabel() == false) {
+X
+X        			continue;
+X        		}
+X        		
+X        		//Check for undefined labels in operands
+X        		operand = current.getOperand();
+X        		
+X        		if(operand.startsWith("#") || operand.startsWith("@")) {
+X        			operand = operand.substring(1);
+X        		}
+X        		
+X        		if(!operand.matches("\\d*") && !operand.matches("")) {
+X        			
+X            		address = symtab.findLabel(operand);
+X            		
+X            		if(address == null) {
+X            			current.setError(2);
+X            		}
+X        		}
+X        		
+X        		/*
+X        		
+X        		//Check for duplicate labels
+X        		label = current.getLabel();
+X        		address = symtab.findLabel(label);
+X        		if(!address.equals("")) {
+X        			current.setError(3);
+X        		}
+X        		*/
+X        		
+X        }
+X    		
+X    		return llist;
+X    }
+X
+X    public static int countInstr(String s) {  
+X		
+X		int n=0;
+X		Scanner in = new Scanner(s);
+X		
+X		while(in.hasNextLine()) {
+X			n++;
+X			in.nextLine();
+X		}
+X		in.close();
+X		return n;
+X	}
+X
+X	public static int findPrime(int n) {
+X		
+X		n*=2;
+X		n+=1;
+X		int m=0;
+X
+X		for(m=2; m<n; m++) {
+X			
+X			if(n%m==0) {
+X				n++;
+X				m=2;
+X			}
+X			else if(m==n-1 && n%m != 0) {
+X				break;
+X			}
+X		}
+X		return n;
+X    }
+X}
+END-of-Project3.java
+echo x - Sample_Input.txt
+sed 's/^X//' >Sample_Input.txt << 'END-of-Sample_Input.txt'
+XADDRES    START    FFF                               
+X. tests pc forward addressing
+X. tests base addressing
+X. tests pc backward addressing
+XNOW      +LDB     #BEGIN              load base register 
+XXXX       BASE     BEGIN              tell assembler  
+XYYY       LDA      =C'TYLER'                 A <- (m..m+2)    
+XEN        RESW     Q                  
+XBE        WORD     C'ABC'                           
+XBEGIN     RESW     1
+XJUNK      RESW     2200                              
+XTHERE     RESW     1                              
+XZZZ       LDA      @34                               
+XMMM       STA      THERE 
+X	  ADDR	   T,S    
+X
+X  
+X	  JSUB	   YYY        
+X	  COMP     54
+X	  RMO	   T,S
+XZZZ	  SHIFT	   A,52
+X	  LDS	   TRAVIS
+X25	  TIO	
+X	  LDT	   =C'ABCD'
+X	  ADD	   #53
+X	  *STSW    #3
+X
+X	  RD             
+XXXX	  LDCH     #5
+X	  *LDT     =X'25'
+X	  *RESW    15
+X	  *WORD
+X	  LDF	   BE
+X	  MULF     #32
+XCATS		   76
+X          END      NOW                              
+END-of-Sample_Input.txt
+echo x - Sample_Output.png
+sed 's/^X//' >Sample_Output.png << 'END-of-Sample_Output.png'
+END-of-Sample_Output.png
+echo x - Table.java
+sed 's/^X//' >Table.java << 'END-of-Table.java'
+X//Travis Jones n00436223
+X//Project 3 COP3404
+X
+Ximport java.util.Objects;
+X
+Xpublic class Table {
+X	
+X	private Instr[] array;
+X	private int length;
+X
+X	public Table(int p) {
+X		length = p;
+X		array = new Instr[length];	
+X	}
+X	
+X	private int genHash(String s) {
+X		int hash = 0;
+X		
+X		for(int i=0; i<s.length(); i++) {
+X			int ch = s.charAt(i);
+X			//Based on Horner's polynomial and 128 ASCII characters
+X			hash = (hash * 128 + ch) % length;
+X		}
+X		return hash;
+X	}
+X
+X	public int insertSymbol(DataItem data) {
+X		
+X		String label = data.getLabel();
+X		Instr symbol = new Instr(label);
+X		int address = data.getAddress();
+X		
+X		symbol.setAddress(Integer.toHexString(address).toUpperCase());
+X		
+X		int hash = genHash(label);
+X		
+X		int i = 1;
+X		
+X		while(array[hash] != null) {
+X			
+X			if(Objects.equals(array[hash].getLabel(), symbol.getLabel())) {
+X				if(!symbol.getAddress().isEmpty()) {
+X					return 3;
+X				}
+X				else {
+X					return 0;
+X				}
+X			}
+X			else {
+X				hash = hash + i*i;
+X				i++;
+X				hash %= length;
+X			}
+X		}
+X		if(symbol.getAddress().isEmpty()) {
+X			
+X			return 2;
+X		}
+X		else {
+X			array[hash] = symbol;
+X			
+X
+X			
+X			return 0;
+X		}
+X	}
+X	
+X	public String findLabel(String s) {
+X		
+X		for(int i=0; i < length; i++) {
+X			if(array[i] != null) {
+X				if(Objects.equals(s, array[i].getLabel())) {
+X					return array[i].getAddress();
+X				}
+X			}
+X		}
+X		
+X		return null;
+X	}
+X		
+X	public void printTable() {
+X		
+X		System.out.println("Table Location\tLabel\t\tAddress\t\tUse\t\tCsect");
+X		
+X		for(int i=0; i < length; i++) {
+X			if(array[i] != null && !array[i].getLabel().equals("")) {
+X				System.out.println(i + "\t\t" + array[i].getLabel() + "\t\t" + array[i].getAddress() + "\t\t" + "main" + "\t\t" + "main");
+X			}
+X		}
+X	}
+X}
+END-of-Table.java
+echo x - makefile
+sed 's/^X//' >makefile << 'END-of-makefile'
+Xall: Project3.class DataItem.class Table.class Instr.class
+XInstr.class: Instr.java
+X	javac Instr.java
+XTable.class: Table.java
+X	javac Table.java
+XDataItem.class: DataItem.java
+X	java DataItem.java
+XProject3.class: Project3.java
+X	javac Project3.java
+X
+X
+X
+X
+X
+X
+X
+END-of-makefile
+echo x - text.txt
+sed 's/^X//' >text.txt << 'END-of-text.txt'
+XTravis Jones
+XN00436223
+XProject 3
+XCOP3404
+X
+XPurpose of project: This is pass 1 of a SIC/XE compatible assembler.
+X
+XSource files: Project3.java, DataItem.java, Table.java, Instr.java
+X
+XInput File: Sample_Input.txt
+X
+XSample Output: Sample_Output.png 
+X
+XInstructions to execute: From command line on Osprey, run
+X
+X	make; java Project3 [file name]
+X
+Xwhere "[file name]" is the name of an input file. Output will print to command line. The input code will print with any detected errors appended after the appropriate lines. The symbol table will print after the input code, separated by a blank line.
+END-of-text.txt
+exit
+

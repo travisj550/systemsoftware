@@ -1,26 +1,24 @@
 //Travis Jones n00436223
-//Project 1 COP3404
+//Project 3 COP3404
 
-//Instr objects store instructions and their number values
 public class Instr {
-	private String mneu = "";
-	private String num = "";
+	private String label = "";
+	private String address = "";
 
-	//Construct a new Instr with s
 	public Instr(String s) {
-		mneu = s;
+		label = s;
 	}
-	//Setter
-	public void setNum(String n) {
-		num = n;
+	
+	public void setAddress(String n) {
+		address = n;
 	}
-	//Getter
-	public String getInstr() {
-		return mneu;
+
+	public String getLabel() {
+		return label;
 	}
-	//Getter
-	public String getNum() {
-		return num;
+	
+	public String getAddress() {
+		return address;
 	}
 	
 }
